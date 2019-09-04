@@ -25,15 +25,17 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class YoutubeJsonMerger {
-
-    public YoutubeJsonMerger() {
+    private static String lang;
+    
+    public YoutubeJsonMerger(String lang) {
+        this.lang=lang;
     }
 
     public static ArrayList<String> getKeywords() throws SQLException {
         Connection con = JDBCConnectionManager.getConnection(); //TODO bad practice because getting it from another project so think about another way
         ArrayList<String> keywords = new ArrayList<String>();
         try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT keyword from en_youtube_keywords"); //TODO change en to lang
+            PreparedStatement preparedStatement = con.prepareStatement("SELECT keyword from "+lang+"_youtube_keywords");
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
                 keywords.add(resultSet.getString("keyword"));
@@ -58,8 +60,7 @@ public class YoutubeJsonMerger {
 
             System.out.println(keywords.get(i) + ":\n" + allData.toString() + "\n");
 
-            //Todo replace en by lang later
-            PreparedStatement pstmt = con.prepareStatement("UPDATE en_youtube_keywords SET allData=? WHERE en_youtube_keywords.keyword=?");
+            PreparedStatement pstmt = con.prepareStatement("UPDATE "+lang+"_youtube_keywords SET allData=? WHERE "+lang+"_youtube_keywords.keyword=?");
             pstmt.setString(1, allData.toString());
             pstmt.setString(2, keywords.get(i));
 
@@ -79,7 +80,7 @@ public class YoutubeJsonMerger {
 
             JsonArray neededData = createNeededDataJsonArray(keyword);
 
-            PreparedStatement pstmt = con.prepareStatement("UPDATE en_youtube_keywords SET neededData=? WHERE en_youtube_keywords.keyword=?");
+            PreparedStatement pstmt = con.prepareStatement("UPDATE "+lang+"_youtube_keywords SET neededData=? WHERE "+lang+"_youtube_keywords.keyword=?");
             pstmt.setString(1, neededData.toString());
             pstmt.setString(2, keyword);
 
@@ -91,11 +92,11 @@ public class YoutubeJsonMerger {
     }
 
 
-    public static JsonObject getAllDataAsJsonFromKeyword(String keyword) throws SQLException {
+    public JsonObject getAllDataAsJsonFromKeyword(String keyword) throws SQLException {
         Connection con = JDBCConnectionManager.getConnection(); //TODO bad practice because getting it from another project so think about another way
         JsonObject allData = new JsonObject();
         try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT allData from en_youtube_keywords WHERE en_youtube_keywords.keyword=?"); //TODO change en to lang
+            PreparedStatement preparedStatement = con.prepareStatement("SELECT allData from "+lang+"_youtube_keywords WHERE "+lang+"_youtube_keywords.keyword=?"); //TODO change en to lang
             preparedStatement.setString(1, keyword);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -111,7 +112,7 @@ public class YoutubeJsonMerger {
         return allData;
     }
 
-    public static JsonObject createAllDataJsonObject(String keyword) throws IOException {
+    public JsonObject createAllDataJsonObject(String keyword) throws IOException {
         JsonObject keywordData = new JsonObject();
         JsonArray videoIds = new JsonArray();
         JsonArray metadata = new JsonArray();
@@ -121,7 +122,7 @@ public class YoutubeJsonMerger {
 
         //add the videosids
         //Todo change en to lang in buffered reader
-        BufferedReader br = new BufferedReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/en/" + keyword + ".txt"));
+        BufferedReader br = new BufferedReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/"+lang+"/" + keyword + ".txt"));
         String videoId = br.readLine();
 
         while (videoId != null) {
@@ -131,9 +132,9 @@ public class YoutubeJsonMerger {
         // metadata and comments here
         for (int j = 0; j < videoIds.size(); j++) {
             Gson gson = new Gson();
-            JsonReader metadataFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/en_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".meta.json"));
+            JsonReader metadataFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/"+lang+"_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".meta.json"));
             //TODO really bad thing to modify files here, modify python script later to return comments as a json array from the beginning
-            Path path = Paths.get("/home/baalbaki/IdeaProjects/YoutubeCrawler/en_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json");
+            Path path = Paths.get("/home/baalbaki/IdeaProjects/YoutubeCrawler/"+lang+"_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json");
             Charset charset = StandardCharsets.UTF_8;
             if (!(new String(Files.readAllBytes(path), charset)).isEmpty()) { //if the file is not empty
                 //Todo uncomment this on a new crawl
@@ -144,7 +145,7 @@ public class YoutubeJsonMerger {
                     commentsJson = new StringBuilder(commentsJson).deleteCharAt(commentsJson.length() - 2).toString(); //remove last comma
                     commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length() - 1, '}').toString(); //remove last comma
                     Files.write(path, commentsJson.getBytes(charset));*/
-                JsonReader commentsFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/en_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
+                JsonReader commentsFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/"+lang+"_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
                 JsonArray commentsJsonArray = gson.fromJson(commentsFileReader, JsonArray.class);
                 comments.add(commentsJsonArray);
             } else {
@@ -162,7 +163,7 @@ public class YoutubeJsonMerger {
         return keywordData;
     }
 
-    public static JsonArray createNeededDataJsonArray(String keyword) throws SQLException {
+    public JsonArray createNeededDataJsonArray(String keyword) throws SQLException {
         JsonObject allData = getAllDataAsJsonFromKeyword(keyword);
         JsonArray allVideoIds = allData.get("videoIds").getAsJsonArray();
         JsonArray allMetadata = allData.get("metadata").getAsJsonArray();
@@ -221,6 +222,7 @@ public class YoutubeJsonMerger {
                     } else {
                         for (int k = 0; k < allComments.get(j).getAsJsonArray().size(); k++) {
                             if (detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) {
+                                //Todo run sentiment analysis on french and italian
                                 int commentSentiment = sentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
                                 if (commentSentiment < 0) {
                                     JsonObject comment = new JsonObject();

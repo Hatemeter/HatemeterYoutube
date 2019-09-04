@@ -18,6 +18,11 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class IslamophobicVideosFetcher {
+    private String lang;
+    
+    public IslamophobicVideosFetcher(String lang){
+        this.lang=lang;
+    }
 
 
     public LinkedHashMap<String, ArrayList<IslamophobicVideo>> showIslamophobicVideos() throws SQLException {
@@ -30,7 +35,7 @@ public class IslamophobicVideosFetcher {
             String keyword = keywords.get(i);
             ArrayList<IslamophobicVideo> islamophobicVideos = new ArrayList<>();
             try {
-                PreparedStatement getIslamophobicVideosQuery = con.prepareStatement("select neededData from en_youtube_keywords where en_youtube_keywords.keyword=?");
+                PreparedStatement getIslamophobicVideosQuery = con.prepareStatement("select neededData from "+lang+"_youtube_keywords where "+lang+"_youtube_keywords.keyword=?");
                 getIslamophobicVideosQuery.setString(1, keyword);
                 ResultSet islamophobicVideosResultSet = getIslamophobicVideosQuery.executeQuery();
                 while (islamophobicVideosResultSet.next()) {

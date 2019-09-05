@@ -1,4 +1,4 @@
-package eu.fbk.dh.HatemeterYoutube.stanfordcorenlp;
+package eu.fbk.dh.HatemeterYoutube.sentimentanalyzers;
 
 import edu.stanford.nlp.pipeline.CoreDocument;
 import edu.stanford.nlp.pipeline.CoreSentence;
@@ -7,7 +7,7 @@ import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import java.util.List;
 import java.util.Properties;
 
-public class SentimentAnalyzer {
+public class EnglishSentimentAnalyzer {
 
     private StanfordCoreNLP pipeline;
 

@@ -47,7 +47,7 @@ public class IslamophobicChannelsIdentifier {
                         String channelName = neededDataJsonArray.get(j).getAsJsonObject().get("channel").getAsJsonObject().get("channelName").getAsString();
                         String channelUrl = neededDataJsonArray.get(j).getAsJsonObject().get("channel").getAsJsonObject().get("channelUrl").getAsString();
 
-                        PreparedStatement checkPreparedStatement = con.prepareStatement("SELECT 1 from "+lang+"_youtube_islamophobic_channels where channelId=?"); //todo change eng to lang
+                        PreparedStatement checkPreparedStatement = con.prepareStatement("SELECT 1 from "+lang+"_youtube_islamophobic_channels where channelId=?");
                         checkPreparedStatement.setString(1, channelId);
                         ResultSet resultSet = checkPreparedStatement.executeQuery();
 

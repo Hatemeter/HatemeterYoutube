@@ -8,10 +8,10 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 public class HatemeterYoutube {
-    public static void main(String[] args) throws IOException {
-        String[] languages={"en","fr","it"};
-        for(int i=0;i<3;i++) {
-            String lang=languages[i];
+    public static void main(String[] args) {
+        //todo: crawl comments here
+        for(int i=0;i<args.length;i++) {
+            String lang=args[i];
             try {
                 YoutubeJsonMerger youtubeJsonMerger = new YoutubeJsonMerger(lang);
                 youtubeJsonMerger.addAllDataJsonToDb();

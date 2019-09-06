@@ -24,13 +24,13 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 public class YoutubeJsonMerger {
-    private static String lang;
+    private String lang;
 
     public YoutubeJsonMerger(String lang) {
         this.lang = lang;
     }
 
-    public static ArrayList<String> getKeywords() throws SQLException {
+    public ArrayList<String> getKeywords() throws SQLException {
         Connection con = JDBCConnectionManager.getConnection(); //TODO bad practice because getting it from another project so think about another way
         ArrayList<String> keywords = new ArrayList<String>();
         try {
@@ -133,13 +133,13 @@ public class YoutubeJsonMerger {
             Charset charset = StandardCharsets.UTF_8;
             if (!(new String(Files.readAllBytes(path), charset)).isEmpty()) { //if the file is not empty
                 //Todo uncomment this on a new crawl
-                String commentsJson = new String(Files.readAllBytes(path), charset).trim();
+                /*String commentsJson = new String(Files.readAllBytes(path), charset).trim();
                 commentsJson = new StringBuilder(commentsJson).insert(0, '[').toString();
                 commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length(), ']').toString();
                 commentsJson = commentsJson.replaceAll("\"}\\s+", "\"},"); //add comma after them
                 commentsJson = new StringBuilder(commentsJson).deleteCharAt(commentsJson.length() - 2).toString(); //remove last comma
                 commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length() - 1, '}').toString(); //remove last comma
-                Files.write(path, commentsJson.getBytes(charset));
+                Files.write(path, commentsJson.getBytes(charset));*/
                 JsonReader commentsFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
                 JsonArray commentsJsonArray = gson.fromJson(commentsFileReader, JsonArray.class);
                 comments.add(commentsJsonArray);
@@ -216,6 +216,7 @@ public class YoutubeJsonMerger {
                     if (allComments.get(j).getAsJsonArray().size() >= 10) {
                         for (int k = 0; k < negativeCommentLimit; k++) {
                             int commentSentiment = 0;
+                            System.out.println("index: "+k+", negative comment limit: "+negativeCommentLimit);
                             if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) { //if it is specifically in english
                                 //TODO ADD ISLAMOPHOBIA CATEGORY DETECTOR
                                 commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
@@ -224,8 +225,8 @@ public class YoutubeJsonMerger {
                             } else if (lang.equals("it") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("it")) {
                                 commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
                             } else {
-                                negativeCommentLimit++;
                                 if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
+                                negativeCommentLimit++;
                             }
                             if (commentSentiment < 0) {
                                 JsonObject comment = new JsonObject();
@@ -237,9 +238,10 @@ public class YoutubeJsonMerger {
                                 counterNegativeComments++;
                                 System.out.println(counterNegativeComments + " negative comments added");
                                 System.out.println();
+                                if(counterNegativeComments==10) break;
                             } else {
-                                negativeCommentLimit++;
                                 if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
+                                negativeCommentLimit++;
                             }
 
                         }
@@ -254,8 +256,8 @@ public class YoutubeJsonMerger {
                                 commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
                             }
                             else{
-                                negativeCommentLimit++;
                                 if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
+                                negativeCommentLimit++;
                             }
                             if (commentSentiment < 0) {
                                 JsonObject comment = new JsonObject();
@@ -267,6 +269,7 @@ public class YoutubeJsonMerger {
                                 counterNegativeComments++;
                                 System.out.println(counterNegativeComments + " negative comments added");
                                 System.out.println();
+                                if(counterNegativeComments==10) break;
                             } else negativeCommentLimit++;
                             if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
                         }
@@ -279,13 +282,13 @@ public class YoutubeJsonMerger {
 
             JsonObject composedJsonObject = new JsonObject();
 
-            if (!comments.get(0).toString().equals("{}")) { //TODO change crawler to crawl only vids with comments rather than doing this
+
                 composedJsonObject.add("video", video);
                 composedJsonObject.add("channel", channel);
                 composedJsonObject.add("comments", comments);
 
                 rootJsonArray.add(composedJsonObject);
-            }
+
         }
         return rootJsonArray;
     }

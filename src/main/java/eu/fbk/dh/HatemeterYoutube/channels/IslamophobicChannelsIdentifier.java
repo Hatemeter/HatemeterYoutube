@@ -25,7 +25,7 @@ public class IslamophobicChannelsIdentifier {
     public void addIslamophobicChannelsToDb() throws SQLException {
         Connection con = JDBCConnectionManager.getConnection();
         try {
-            ArrayList<String> keywords = YoutubeJsonMerger.getKeywords();
+            ArrayList<String> keywords = new YoutubeJsonMerger("en").getKeywords();
             for (int i = 0; i < keywords.size(); i++) {
                 String keyword = keywords.get(i);
                 PreparedStatement getNeededDataFromKeywordQuery = con.prepareStatement("SELECT neededData from "+lang+"_youtube_keywords where keyword=?");
@@ -97,7 +97,7 @@ public class IslamophobicChannelsIdentifier {
                             }
 
                             if (videoAlreadyAdded == false) { //if this false
-                                PreparedStatement replacePreparedStatement = con.prepareStatement("UPDATE "+lang+"_youtube_islamophobic_channels SET islamophobicVideos=?, nbOfSubscribers=?, nbOfIslamophobicVideos=? where channelId=?"); //these are the only things that will change
+                                PreparedStatement replacePreparedStatement = con.prepareStatement("UPDATE "+lang+"_youtube_islamophobic_channels SET islamophobicVideos=?, nbOfIslamophobicVideos=? where channelId=?"); //these are the only things that will change
                                 JsonObject islamophobicVideoJsonObject = new JsonObject();
                                 islamophobicVideoJsonObject.addProperty("videoId", videoId);
                                 islamophobicVideoJsonObject.addProperty("videoTitle", videoTitle);

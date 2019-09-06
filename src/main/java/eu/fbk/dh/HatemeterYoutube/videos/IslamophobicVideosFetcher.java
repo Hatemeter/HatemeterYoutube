@@ -30,7 +30,7 @@ public class IslamophobicVideosFetcher {
         System.out.println("---------------------");
         Connection con = JDBCConnectionManager.getConnection();
         LinkedHashMap<String, ArrayList<IslamophobicVideo>> islamophobicVideosWithKeywords = new LinkedHashMap<>();
-        ArrayList<String> keywords = YoutubeJsonMerger.getKeywords();
+        ArrayList<String> keywords = new YoutubeJsonMerger("en").getKeywords();
         for (int i = 0; i < keywords.size(); i++) {
             String keyword = keywords.get(i);
             ArrayList<IslamophobicVideo> islamophobicVideos = new ArrayList<>();

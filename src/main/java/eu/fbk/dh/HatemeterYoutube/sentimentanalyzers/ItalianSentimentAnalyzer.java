@@ -36,10 +36,7 @@ public class ItalianSentimentAnalyzer extends SentimentAnalyzer {
     }
 
     public void loadLexicon() throws IOException, InvalidFormatException {
-        //Todo: put the resources in event relater instead of italiananalyzer
-        //Todo: use the excel file in the resources
-        // ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
-        ExcelFile excelFile = new ExcelFile(new File("/home/baalbaki/Documents/HATEMETER/Docs/italianlexicon.xlsx")); //get the eu.fbk.dh.ItalianSentimentAnalyzer.excel file
+        ExcelFile excelFile = new ExcelFile(new File(getClass().getClassLoader().getResource("italianlexicon.xlsx").getFile())); //get the eu.fbk.dh.ItalianSentimentAnalyzer.excel file
         XSSFSheet sheet = excelFile.getSheet(); //got the sheet from the eu.fbk.dh.ItalianSentimentAnalyzer.excel file
         int numberOfRows = excelFile.getRows(); //got the number of rows of the file
         int numberOfColumns = sheet.getRow(0).getPhysicalNumberOfCells(); //got the number of columns of the file

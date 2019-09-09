@@ -31,7 +31,7 @@ public class YoutubeJsonMerger {
     }
 
     public ArrayList<String> getKeywords() throws SQLException {
-        Connection con = JDBCConnectionManager.getConnection(); //TODO bad practice because getting it from another project so think about another way
+        Connection con = JDBCConnectionManager.getConnection();
         ArrayList<String> keywords = new ArrayList<String>();
         try {
             PreparedStatement preparedStatement = con.prepareStatement("SELECT keyword from " + lang + "_youtube_keywords");
@@ -92,10 +92,10 @@ public class YoutubeJsonMerger {
 
 
     public JsonObject getAllDataAsJsonFromKeyword(String keyword) throws SQLException {
-        Connection con = JDBCConnectionManager.getConnection(); //TODO bad practice because getting it from another project so think about another way
+        Connection con = JDBCConnectionManager.getConnection();
         JsonObject allData = new JsonObject();
         try {
-            PreparedStatement preparedStatement = con.prepareStatement("SELECT allData from " + lang + "_youtube_keywords WHERE " + lang + "_youtube_keywords.keyword=?"); //TODO change en to lang
+            PreparedStatement preparedStatement = con.prepareStatement("SELECT allData from " + lang + "_youtube_keywords WHERE " + lang + "_youtube_keywords.keyword=?");
             preparedStatement.setString(1, keyword);
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
@@ -132,7 +132,7 @@ public class YoutubeJsonMerger {
             Path path = Paths.get("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json");
             Charset charset = StandardCharsets.UTF_8;
             if (!(new String(Files.readAllBytes(path), charset)).isEmpty()) { //if the file is not empty
-                //Todo uncomment this on a new crawl
+                //Todo uncomment this on a new crawl, DO NOT DELETE THIS UNLESS YOU MODIFIED THE PYTHON CRAWLER
                 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 /*String commentsJson = new String(Files.readAllBytes(path), charset).trim();
                 commentsJson = new StringBuilder(commentsJson).insert(0, '[').toString();
@@ -223,7 +223,6 @@ public class YoutubeJsonMerger {
                             break; //reached the last comment so exit
 
                         if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) { //if it is specifically in english
-                            //TODO ADD ISLAMOPHOBIA CATEGORY DETECTOR
                             commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
                         } else if (lang.equals("fr") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("fr")) {
                             commentSentiment = frenchSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());

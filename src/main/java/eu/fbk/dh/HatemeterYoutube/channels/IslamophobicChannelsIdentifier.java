@@ -151,9 +151,6 @@ public class IslamophobicChannelsIdentifier {
                                 , getIslamophobicChannelsResultSet.getInt("nbOfIslamophobicVideos"));
                         islamophobicChannels.add(islamophobicChannel);
                 }
-                /*else{ //TODO
-                    return null; //no islamophobic channels found
-                }*/
                 getIslamophobicChannelsQuery.close();
             }
             catch (Exception e){

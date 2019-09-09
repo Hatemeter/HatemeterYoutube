@@ -133,6 +133,7 @@ public class YoutubeJsonMerger {
             Charset charset = StandardCharsets.UTF_8;
             if (!(new String(Files.readAllBytes(path), charset)).isEmpty()) { //if the file is not empty
                 //Todo uncomment this on a new crawl
+                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 /*String commentsJson = new String(Files.readAllBytes(path), charset).trim();
                 commentsJson = new StringBuilder(commentsJson).insert(0, '[').toString();
                 commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length(), ']').toString();
@@ -140,6 +141,7 @@ public class YoutubeJsonMerger {
                 commentsJson = new StringBuilder(commentsJson).deleteCharAt(commentsJson.length() - 2).toString(); //remove last comma
                 commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length() - 1, '}').toString(); //remove last comma
                 Files.write(path, commentsJson.getBytes(charset));*/
+                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 JsonReader commentsFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
                 JsonArray commentsJsonArray = gson.fromJson(commentsFileReader, JsonArray.class);
                 comments.add(commentsJsonArray);
@@ -227,6 +229,7 @@ public class YoutubeJsonMerger {
                             } else {
                                 if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
                                 negativeCommentLimit++;
+                                continue; //different language so skip
                             }
                             if (commentSentiment < 0) {
                                 JsonObject comment = new JsonObject();

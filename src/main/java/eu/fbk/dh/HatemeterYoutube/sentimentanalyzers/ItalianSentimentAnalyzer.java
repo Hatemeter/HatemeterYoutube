@@ -70,24 +70,30 @@ public class ItalianSentimentAnalyzer extends SentimentAnalyzer {
         int commentSentiment = 0;
 
         System.out.println("Comment: " + comment);
-        Annotation stanfordAnnotation = pipeline.runRaw(comment.trim());
-        System.out.println();
-        //System.out.println("The lemmatized words in this comment are: ");
-        List<CoreMap> sentences = stanfordAnnotation.get(CoreAnnotations.SentencesAnnotation.class);
-        for (CoreMap sentence : sentences) {
-            List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
-            for (CoreLabel c : tokens) {
-                if (negativeAndPositiveLexicon.get(0).contains(c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase())) {
-                    //System.out.println("Negative: " + c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
-                    commentSentiment--;
-                } else if (negativeAndPositiveLexicon.get(1).contains(c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase())) {
-                    //System.out.println("Positive: " + c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
-                    commentSentiment++;
+        try {
+            if(!comment.contains(".......")) { //TODO remove, workaround digimorph's bug
+                Annotation stanfordAnnotation = pipeline.runRaw(comment.trim());
+                System.out.println();
+                //System.out.println("The lemmatized words in this comment are: ");
+                List<CoreMap> sentences = stanfordAnnotation.get(CoreAnnotations.SentencesAnnotation.class);
+                for (CoreMap sentence : sentences) {
+                    List<CoreLabel> tokens = sentence.get(CoreAnnotations.TokensAnnotation.class);
+                    for (CoreLabel c : tokens) {
+                        if (negativeAndPositiveLexicon.get(0).contains(c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase())) {
+                            //System.out.println("Negative: " + c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
+                            commentSentiment--;
+                        } else if (negativeAndPositiveLexicon.get(1).contains(c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase())) {
+                            //System.out.println("Positive: " + c.get(CoreAnnotations.LemmaAnnotation.class).toLowerCase());
+                            commentSentiment++;
+                        }
+                    }
                 }
+                System.out.println("Comment sentiment: " + commentSentiment);
             }
         }
-        System.out.println("Comment sentiment: " + commentSentiment);
-
+        catch (Exception e){
+            e.printStackTrace();
+        }
         return commentSentiment;
     }
 }

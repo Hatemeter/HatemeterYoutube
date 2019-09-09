@@ -25,7 +25,7 @@ public class IslamophobicChannelsIdentifier {
     public void addIslamophobicChannelsToDb() throws SQLException {
         Connection con = JDBCConnectionManager.getConnection();
         try {
-            ArrayList<String> keywords = new YoutubeJsonMerger("en").getKeywords();
+            ArrayList<String> keywords = new YoutubeJsonMerger(lang).getKeywords();
             for (int i = 0; i < keywords.size(); i++) {
                 String keyword = keywords.get(i);
                 PreparedStatement getNeededDataFromKeywordQuery = con.prepareStatement("SELECT neededData from "+lang+"_youtube_keywords where keyword=?");

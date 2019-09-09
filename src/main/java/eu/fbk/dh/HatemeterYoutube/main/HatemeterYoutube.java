@@ -14,8 +14,8 @@ public class HatemeterYoutube {
             String lang=args[i];
             try {
                 YoutubeJsonMerger youtubeJsonMerger = new YoutubeJsonMerger(lang);
-                youtubeJsonMerger.addAllDataJsonToDb();
-                youtubeJsonMerger.addNeededDataJsonToDb();
+                youtubeJsonMerger.addAllDataJsonToDb(); //all all crawled data to database
+                youtubeJsonMerger.addNeededDataJsonToDb(); //create, curate and add the data we will use to the database
 
                 IslamophobicVideosFetcher islamophobicVideosFetcher = new IslamophobicVideosFetcher(lang);
                 System.out.println(islamophobicVideosFetcher.showIslamophobicVideos());

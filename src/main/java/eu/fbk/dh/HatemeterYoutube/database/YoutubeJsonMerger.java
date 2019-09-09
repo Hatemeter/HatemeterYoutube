@@ -169,9 +169,9 @@ public class YoutubeJsonMerger {
         EnglishSentimentAnalyzer englishSentimentAnalyzer = null;
         FrenchSentimentAnalyzer frenchSentimentAnalyzer = null;
         ItalianSentimentAnalyzer italianSentimentAnalyzer = null;
-        JsonArray comments=null;
-        JsonObject video=null;
-        JsonObject channel=null;
+        JsonArray comments = null;
+        JsonObject video = null;
+        JsonObject channel = null;
 
         if (lang.equals("en")) {
             englishSentimentAnalyzer = new EnglishSentimentAnalyzer();
@@ -214,54 +214,26 @@ public class YoutubeJsonMerger {
                 comments = new JsonArray();
                 int negativeCommentLimit = 10;
                 int counterNegativeComments = 0;
-                if (allComments.get(j).getAsJsonArray().size() > 0) {
-                    if (allComments.get(j).getAsJsonArray().size() >= 10) {
-                        for (int k = 0; k < negativeCommentLimit; k++) {
-                            int commentSentiment = 0;
-                            System.out.println("index: "+k+", negative comment limit: "+negativeCommentLimit);
-                            if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) { //if it is specifically in english
-                                //TODO ADD ISLAMOPHOBIA CATEGORY DETECTOR
-                                commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            } else if (lang.equals("fr") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("fr")) {
-                                commentSentiment = frenchSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            } else if (lang.equals("it") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("it")) {
-                                commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            } else {
-                                if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
-                                negativeCommentLimit++;
-                                continue; //different language so skip
-                            }
-                            if (commentSentiment < 0) {
-                                JsonObject comment = new JsonObject();
-                                comment.addProperty("commentId", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("cid").getAsString());
-                                comment.addProperty("commentText", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                                comment.addProperty("commentTime", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("time").getAsString());
-                                comment.addProperty("commentAuthor", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("author").getAsString());
-                                comments.add(comment);
-                                counterNegativeComments++;
-                                System.out.println(counterNegativeComments + " negative comments added");
-                                System.out.println();
-                                if(counterNegativeComments==10) break;
-                            } else {
-                                if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
-                                negativeCommentLimit++;
-                            }
-
-                        }
-                    } else {
+                if (allComments.get(j).getAsJsonArray().size() > 0) { //if there are comments
+                    for (int k = 0; k < negativeCommentLimit; k++) {
                         int commentSentiment = 0;
-                        for (int k = 0; k < allComments.get(j).getAsJsonArray().size(); k++) {
-                            if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) {
-                                commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            } else if (lang.equals("fr") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("fr")) {
-                                commentSentiment = frenchSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            } else if (lang.equals("it") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("it")) {
-                                commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            }
-                            else{
-                                if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
-                                negativeCommentLimit++;
-                            }
+                        boolean languageIsDifferent = false;
+                        System.out.println("index: " + k + ", negative comment limit: " + negativeCommentLimit);
+                        if (k == allComments.get(j).getAsJsonArray().size() - 1)
+                            break; //reached the last comment so exit
+
+                        if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) { //if it is specifically in english
+                            //TODO ADD ISLAMOPHOBIA CATEGORY DETECTOR
+                            commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                        } else if (lang.equals("fr") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("fr")) {
+                            commentSentiment = frenchSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                        } else if (lang.equals("it") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("it")) {
+                            commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                        } else { //if language is different
+                            negativeCommentLimit++;
+                            languageIsDifferent = true;
+                        }
+                        if (languageIsDifferent == false) { //if one of the languages is satisfied
                             if (commentSentiment < 0) {
                                 JsonObject comment = new JsonObject();
                                 comment.addProperty("commentId", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("cid").getAsString());
@@ -272,27 +244,32 @@ public class YoutubeJsonMerger {
                                 counterNegativeComments++;
                                 System.out.println(counterNegativeComments + " negative comments added");
                                 System.out.println();
-                                if(counterNegativeComments==10) break;
-                            } else negativeCommentLimit++;
-                            if (negativeCommentLimit == allComments.get(j).getAsJsonArray().size()) break;
+                                if (counterNegativeComments == 10) break; //this is the perfect scenario
+                            } else {
+                                negativeCommentLimit++;
+                            }
                         }
+
                     }
                 }
-            } else {
-                JsonObject comment = new JsonObject();
-                comments.add(comment);
-            }
 
-            JsonObject composedJsonObject = new JsonObject();
+                else { //if there are no comments
+                    JsonObject comment = new JsonObject();
+                    comments.add(comment);
+                }
 
+                JsonObject composedJsonObject = new JsonObject();
 
                 composedJsonObject.add("video", video);
                 composedJsonObject.add("channel", channel);
                 composedJsonObject.add("comments", comments);
+                System.out.println("composed: " + composedJsonObject.toString());
 
                 rootJsonArray.add(composedJsonObject);
-
+                System.out.println("root json array: " + rootJsonArray.toString());
+            }
         }
         return rootJsonArray;
     }
+
 }

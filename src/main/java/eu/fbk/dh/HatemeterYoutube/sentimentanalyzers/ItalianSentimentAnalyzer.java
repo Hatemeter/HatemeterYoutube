@@ -68,7 +68,6 @@ public class ItalianSentimentAnalyzer extends SentimentAnalyzer {
 
         System.out.println("Comment: " + comment);
         try {
-            if(!comment.contains(".......")) { //TODO remove, workaround digimorph's bug
                 Annotation stanfordAnnotation = pipeline.runRaw(comment.trim());
                 System.out.println();
                 //System.out.println("The lemmatized words in this comment are: ");
@@ -86,7 +85,6 @@ public class ItalianSentimentAnalyzer extends SentimentAnalyzer {
                     }
                 }
                 System.out.println("Comment sentiment: " + commentSentiment);
-            }
         }
         catch (Exception e){
             e.printStackTrace();

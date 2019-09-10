@@ -55,10 +55,8 @@ public class FrenchSentimentAnalyzer extends SentimentAnalyzer {
                             .build(frenchLemmasApikey, language)
                             .withText(comment.trim())
                             .send();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                } catch (Request.ParameterValidationException e) {
-                    e.printStackTrace();
+                } catch (Exception e) {
+                    //don't want the "expected an int error to print"
                 }
 
                 List<ParserResponse.Lemma> lemmas = r.lemmatize();

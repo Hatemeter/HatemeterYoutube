@@ -128,20 +128,9 @@ public class YoutubeJsonMerger {
         for (int j = 0; j < videoIds.size(); j++) {
             Gson gson = new Gson();
             JsonReader metadataFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".meta.json"));
-            //TODO really bad thing to modify files here, modify python script later to return comments as a json array from the beginning
             Path path = Paths.get("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json");
             Charset charset = StandardCharsets.UTF_8;
             if (!(new String(Files.readAllBytes(path), charset)).isEmpty()) { //if the file is not empty
-                //Todo uncomment this on a new crawl, DO NOT DELETE THIS UNLESS YOU MODIFIED THE PYTHON CRAWLER
-                ///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-                /*String commentsJson = new String(Files.readAllBytes(path), charset).trim();
-                commentsJson = new StringBuilder(commentsJson).insert(0, '[').toString();
-                commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length(), ']').toString();
-                commentsJson = commentsJson.replaceAll("\"}\\s+", "\"},"); //add comma after them
-                commentsJson = new StringBuilder(commentsJson).deleteCharAt(commentsJson.length() - 2).toString(); //remove last comma
-                commentsJson = new StringBuilder(commentsJson).insert(commentsJson.length() - 1, '}').toString(); //remove last comma
-                Files.write(path, commentsJson.getBytes(charset));*/
-                ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                 JsonReader commentsFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
                 JsonArray commentsJsonArray = gson.fromJson(commentsFileReader, JsonArray.class);
                 comments.add(commentsJsonArray);
@@ -196,6 +185,7 @@ public class YoutubeJsonMerger {
         for (int j = 0; j < allVideoIds.size(); j++) {
             if (allComments.get(j).getAsJsonArray().size() > 0 && detector.detectLanguageOf(allMetadata.get(j).getAsJsonObject().get("title").getAsString()).getIsoCode().equals(lang)) { //if the videos has comments and the title of the video is in the same language
                 video = new JsonObject();
+                System.out.println();
                 System.out.println("VIDEO " + allVideoIds.get(j).getAsString() + " entered");
                 System.out.println("----------------------------------------------------");
                 video.addProperty("videoId", allVideoIds.get(j).getAsString());
@@ -237,7 +227,7 @@ public class YoutubeJsonMerger {
                             JsonObject comment = new JsonObject();
                             comment.addProperty("commentId", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("cid").getAsString());
                             comment.addProperty("commentText", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                            comment.addProperty("commentTime", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("time").getAsString());
+                            comment.addProperty("commentTime", changeUploadTimeToEnglish(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("time").getAsString()));
                             comment.addProperty("commentAuthor", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("author").getAsString());
                             comments.add(comment);
                             counterNegativeComments++;
@@ -267,6 +257,58 @@ public class YoutubeJsonMerger {
             } //else continue is implicit so no need to write it
         }
         return rootJsonArray;
+    }
+
+    public static String changeUploadTimeToEnglish(String uploadTime) {
+        if (uploadTime.contains("fa")) {
+            uploadTime = uploadTime.replace("fa", "ago");
+        }
+        if (uploadTime.contains("(modificato)")) {
+            uploadTime = uploadTime.replace("(modificato)", "(modified)");
+        }
+        if (uploadTime.contains("secondo")) {
+            uploadTime = uploadTime.replace("secondo", "second");
+        }
+        if (uploadTime.contains("secondi")) {
+            uploadTime = uploadTime.replace("secondi", "seconds");
+        }
+        if (uploadTime.contains("minuto")) {
+            uploadTime = uploadTime.replace("minuto", "minute");
+        }
+        if (uploadTime.contains("minuti")) {
+            uploadTime = uploadTime.replace("minuti", "minutes");
+        }
+        if (uploadTime.contains("ora")) {
+            uploadTime = uploadTime.replace("ora", "hour");
+        }
+        if (uploadTime.contains("ore")) {
+            uploadTime = uploadTime.replace("ore", "hours");
+        }
+        if (uploadTime.contains("giorno")) {
+            uploadTime = uploadTime.replace("giorno", "day");
+        }
+        if (uploadTime.contains("giorni")) {
+            uploadTime = uploadTime.replace("giorni", "days");
+        }
+        if (uploadTime.contains("settimana")) {
+            uploadTime = uploadTime.replace("settimana", "week");
+        }
+        if (uploadTime.contains("settimane")) {
+            uploadTime = uploadTime.replace("settimane", "weeks");
+        }
+        if (uploadTime.contains("mese")) {
+            uploadTime = uploadTime.replace("mese", "month");
+        }
+        if (uploadTime.contains("mesi")) {
+            uploadTime = uploadTime.replace("mesi", "months");
+        }
+        if (uploadTime.contains("anno")) {
+            uploadTime = uploadTime.replace("anno", "year");
+        }
+        if (uploadTime.contains("anni")) {
+            uploadTime = uploadTime.replace("anni", "years");
+        }
+        return uploadTime;
     }
 
 }

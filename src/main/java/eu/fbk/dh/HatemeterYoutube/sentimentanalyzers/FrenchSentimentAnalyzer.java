@@ -55,20 +55,25 @@ public class FrenchSentimentAnalyzer extends SentimentAnalyzer {
                             .build(frenchLemmasApikey, language)
                             .withText(comment.trim())
                             .send();
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     //don't want the "expected an int error to print"
                 }
 
-                List<ParserResponse.Lemma> lemmas = r.lemmatize();
-                for (ParserResponse.Lemma lemma : lemmas) {
-                    //System.out.println("Lemma:  " + lemma.getLemma());
-                    for (int z = 0; z < negativeWordsFromLexicon.size(); z++) {
-                        if (negativeWordsFromLexicon.get(z).equals(lemma.getLemma())) {
-                            commentSentiment--;
-                            //System.out.println("Negative: " + lemma.getLemma() + ": " + z);
-                            break;
+                try {
+                    List<ParserResponse.Lemma> lemmas = r.lemmatize();
+                    for (ParserResponse.Lemma lemma : lemmas) {
+                        //System.out.println("Lemma:  " + lemma.getLemma());
+                        for (int z = 0; z < negativeWordsFromLexicon.size(); z++) {
+                            if (negativeWordsFromLexicon.get(z).equals(lemma.getLemma())) {
+                                commentSentiment--;
+                                //System.out.println("Negative: " + lemma.getLemma() + ": " + z);
+                                break;
+                            }
                         }
                     }
+                }
+                catch (NullPointerException e){
+                    //don't want the null pointer exception to print
                 }
 
                 System.out.println("Comment sentiment: "+commentSentiment);

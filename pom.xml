@@ -22,11 +22,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>eu.fbk.dh</groupId>
-            <artifactId>YoutubeCrawler</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.poi</groupId>
             <artifactId>poi</artifactId>
             <version>3.17</version>
@@ -88,6 +83,22 @@
             <groupId>eu.fbk.dh</groupId>
             <artifactId>KD-StanfordAnnotator</artifactId>
             <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.google.api-client</groupId>
+            <artifactId>google-api-client</artifactId>
+            <version>1.25.0</version>
+        </dependency>
+        <!-- https://mvnrepository.com/artifact/com.google.apis/google-api-services-youtube -->
+        <dependency>
+            <groupId>com.google.apis</groupId>
+            <artifactId>google-api-services-youtube</artifactId>
+            <version>v3-rev212-1.25.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.pemistahl</groupId>
+            <artifactId>lingua</artifactId>
+            <version>0.5.0</version>
         </dependency>
     </dependencies>
     </project>

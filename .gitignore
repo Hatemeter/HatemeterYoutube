@@ -2,3 +2,8 @@
 /src/main/resources/
 *.i*
 src/bin/__pycache__/
+en/
+fr/
+it/
+*_comments/
+*_list

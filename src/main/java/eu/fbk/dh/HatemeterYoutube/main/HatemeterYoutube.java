@@ -1,6 +1,7 @@
 package eu.fbk.dh.HatemeterYoutube.main;
 
 import eu.fbk.dh.HatemeterYoutube.channels.IslamophobicChannelsIdentifier;
+import eu.fbk.dh.HatemeterYoutube.crawler.YoutubeCrawler;
 import eu.fbk.dh.HatemeterYoutube.database.JDBCConnectionManager;
 import eu.fbk.dh.HatemeterYoutube.database.YoutubeJsonMerger;
 import eu.fbk.dh.HatemeterYoutube.videos.IslamophobicVideosFetcher;
@@ -13,6 +14,9 @@ import java.util.Properties;
 public class HatemeterYoutube {
     public static void main(String[] args) {
         try {
+
+            YoutubeCrawler.main(args); //not a good practice, downloading the video ids
+
             InputStream input = HatemeterYoutube.class.getClassLoader().getResourceAsStream("config.properties");
             Properties prop = new Properties();
             prop.load(input);
@@ -27,7 +31,7 @@ public class HatemeterYoutube {
                         "src/bin/down-all.py",
                         "--languages", lang,
                         "--folder", commentsFilePath
-                ).start();
+                ).start(); //downloading the youtube comments
                 InputStream is = process.getInputStream();
                 InputStreamReader isr = new InputStreamReader(is);
                 BufferedReader br = new BufferedReader(isr);
@@ -36,6 +40,7 @@ public class HatemeterYoutube {
                     System.out.println(line);
                 }
 
+                //adding everything to the database
                 YoutubeJsonMerger youtubeJsonMerger = new YoutubeJsonMerger(lang);
                 youtubeJsonMerger.addAllDataJsonToDb(); //all all crawled data to database
                 youtubeJsonMerger.addNeededDataJsonToDb(); //create, curate and add the data we will use to the database

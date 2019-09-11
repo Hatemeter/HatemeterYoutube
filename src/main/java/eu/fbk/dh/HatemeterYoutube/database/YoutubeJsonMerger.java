@@ -25,9 +25,19 @@ import java.util.Properties;
 
 public class YoutubeJsonMerger {
     private String lang;
+    private String commentsFilePath;
 
     public YoutubeJsonMerger(String lang) {
         this.lang = lang;
+        try {
+            InputStream input = getClass().getClassLoader().getResourceAsStream("config.properties");
+            Properties prop = new Properties();
+            prop.load(input);
+            commentsFilePath = prop.getProperty("commentsFilePath");
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     public ArrayList<String> getKeywords() throws SQLException {
@@ -117,7 +127,7 @@ public class YoutubeJsonMerger {
         JsonArray metadata = new JsonArray();
         JsonArray comments = new JsonArray();
 
-        BufferedReader br = new BufferedReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "/" + keyword + ".txt"));
+        BufferedReader br = new BufferedReader(new FileReader(commentsFilePath + lang + "/" + keyword + ".txt"));
         String videoId = br.readLine();
 
         while (videoId != null) {
@@ -127,11 +137,11 @@ public class YoutubeJsonMerger {
         // metadata and comments here
         for (int j = 0; j < videoIds.size(); j++) {
             Gson gson = new Gson();
-            JsonReader metadataFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".meta.json"));
-            Path path = Paths.get("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json");
+            JsonReader metadataFileReader = new JsonReader(new FileReader(commentsFilePath + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".meta.json"));
+            Path path = Paths.get(commentsFilePath + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json");
             Charset charset = StandardCharsets.UTF_8;
             if (!(new String(Files.readAllBytes(path), charset)).isEmpty()) { //if the file is not empty
-                JsonReader commentsFileReader = new JsonReader(new FileReader("/home/baalbaki/IdeaProjects/YoutubeCrawler/" + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
+                JsonReader commentsFileReader = new JsonReader(new FileReader(commentsFilePath + lang + "_comments/" + keyword + "." + videoIds.get(j).toString().substring(1, videoIds.get(j).toString().length() - 1) + ".comments.json"));
                 JsonArray commentsJsonArray = gson.fromJson(commentsFileReader, JsonArray.class);
                 comments.add(commentsJsonArray);
             } else {
@@ -169,7 +179,7 @@ public class YoutubeJsonMerger {
             Properties prop = new Properties();
             InputStream input = null;
             try {
-                input = YoutubeJsonMerger.class.getClassLoader().getResourceAsStream("apicredentials.properties");
+                input = YoutubeJsonMerger.class.getClassLoader().getResourceAsStream("config.properties");
                 prop.load(input);
                 String frenchLemmasApiKey = prop.getProperty("frenchLemmasApiKey");
                 frenchSentimentAnalyzer = new FrenchSentimentAnalyzer(frenchLemmasApiKey);

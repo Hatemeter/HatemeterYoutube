@@ -9,6 +9,7 @@ import java.util.Properties;
 public class JDBCConnectionManager {
     private static String username=null;
     private static String password=null;
+    private static String connection=null;
 
     public static Connection getConnection() {
         Connection con=null;
@@ -16,16 +17,17 @@ public class JDBCConnectionManager {
             Class.forName("com.mysql.cj.jdbc.Driver");
             try {
                 try {
-                    InputStream input = JDBCConnectionManager.class.getClassLoader().getResourceAsStream("dbcredentials.properties");
+                    InputStream input = JDBCConnectionManager.class.getClassLoader().getResourceAsStream("config.properties");
                     Properties prop = new Properties();
                     prop.load(input);
                     username = prop.getProperty("mysqlUser");
                     password= prop.getProperty("mysqlPassword");
+                    connection= prop.getProperty("connection");
                 }
                 catch (Exception e){
                     e.printStackTrace();
                 }
-                con = DriverManager.getConnection("jdbc:mysql://127.0.0.1:3306/HateMeter?autoreconnect=true&allowMultiQueries=true&connectTimeout=0&socketTimeout=0&useUnicode=yes&characterEncoding=UTF-8&serverTimezone=UTC", username, password);
+                con = DriverManager.getConnection(connection, username, password);
             } catch (SQLException ex) {
                 System.out.println("Failed to create the database connection.");
             }

@@ -194,7 +194,7 @@ public class YoutubeJsonMerger {
         LanguageDetector detector = LanguageDetectorBuilder.fromAllBuiltInLanguages().build();
 
         for (int j = 0; j < allVideoIds.size(); j++) {
-            if (detector.detectLanguageOf(allMetadata.get(j).getAsJsonObject().get("title").getAsString()).getIsoCode().equals(lang)) { //title of the video
+            if (allComments.get(j).getAsJsonArray().size() > 0 && detector.detectLanguageOf(allMetadata.get(j).getAsJsonObject().get("title").getAsString()).getIsoCode().equals(lang)) { //if the videos has comments and the title of the video is in the same language
                 video = new JsonObject();
                 System.out.println("VIDEO " + allVideoIds.get(j).getAsString() + " entered");
                 System.out.println("----------------------------------------------------");
@@ -214,47 +214,45 @@ public class YoutubeJsonMerger {
                 comments = new JsonArray();
                 int negativeCommentLimit = 10;
                 int counterNegativeComments = 0;
-                if (allComments.get(j).getAsJsonArray().size() > 0) { //if there are comments
-                    for (int k = 0; k < negativeCommentLimit; k++) {
-                        int commentSentiment = 0;
-                        boolean languageIsDifferent = false;
-                        System.out.println("index: " + k + ", negative comment limit: " + negativeCommentLimit);
-                        if (k == allComments.get(j).getAsJsonArray().size() - 1)
-                            break; //reached the last comment so exit
 
-                        if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) { //if it is specifically in english
-                            commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                        } else if (lang.equals("fr") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("fr")) {
-                            commentSentiment = frenchSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                        } else if (lang.equals("it") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("it")) {
-                            commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                        } else { //if language is different
-                            negativeCommentLimit++;
-                            languageIsDifferent = true;
-                        }
-                        if (languageIsDifferent == false) { //if one of the languages is satisfied
-                            if (commentSentiment < 0) {
-                                JsonObject comment = new JsonObject();
-                                comment.addProperty("commentId", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("cid").getAsString());
-                                comment.addProperty("commentText", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
-                                comment.addProperty("commentTime", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("time").getAsString());
-                                comment.addProperty("commentAuthor", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("author").getAsString());
-                                comments.add(comment);
-                                counterNegativeComments++;
-                                System.out.println(counterNegativeComments + " negative comments added");
-                                System.out.println();
-                                if (counterNegativeComments == 10) break; //this is the perfect scenario
-                            } else {
-                                negativeCommentLimit++;
-                            }
-                        }
+                for (int k = 0; k < negativeCommentLimit; k++) {
+                    int commentSentiment = 0;
+                    boolean languageIsDifferent = false;
+                    System.out.println("index: " + k + ", negative comment limit: " + negativeCommentLimit);
+                    if (k == allComments.get(j).getAsJsonArray().size() - 1)
+                        break; //reached the last comment so exit
 
+                    if (lang.equals("en") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("en")) { //if it is specifically in english
+                        commentSentiment = englishSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                    } else if (lang.equals("fr") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("fr")) {
+                        commentSentiment = frenchSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                    } else if (lang.equals("it") && detector.detectLanguageOf(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString()).getIsoCode().equals("it")) {
+                        commentSentiment = italianSentimentAnalyzer.getSentiment(allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                    } else { //if language is different
+                        negativeCommentLimit++;
+                        languageIsDifferent = true;
                     }
+                    if (languageIsDifferent == false) { //if one of the languages is satisfied
+                        if (commentSentiment < 0) {
+                            JsonObject comment = new JsonObject();
+                            comment.addProperty("commentId", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("cid").getAsString());
+                            comment.addProperty("commentText", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("text").getAsString());
+                            comment.addProperty("commentTime", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("time").getAsString());
+                            comment.addProperty("commentAuthor", allComments.get(j).getAsJsonArray().get(k).getAsJsonObject().get("author").getAsString());
+                            comments.add(comment);
+                            counterNegativeComments++;
+                            System.out.println(counterNegativeComments + " negative comments added");
+                            System.out.println();
+                            if (counterNegativeComments == 10) break; //this is the perfect scenario
+                        } else {
+                            negativeCommentLimit++;
+                        }
+                    }
+
                 }
 
-                else { //if there are no comments
-                    JsonObject comment = new JsonObject();
-                    comments.add(comment);
+                if (comments.size() == 0) { //if after sentiment analysis no negative comments found, skip the video
+                    continue;
                 }
 
                 JsonObject composedJsonObject = new JsonObject();
@@ -266,7 +264,7 @@ public class YoutubeJsonMerger {
 
                 rootJsonArray.add(composedJsonObject);
                 System.out.println("root json array: " + rootJsonArray.toString());
-            }
+            } //else continue is implicit so no need to write it
         }
         return rootJsonArray;
     }

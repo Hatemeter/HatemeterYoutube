@@ -53,9 +53,7 @@ public class IslamophobicVideosFetcher {
                         islamophobicVideosWithKeywords.put(keyword, islamophobicVideos);
                     }
                 }
-                /*else{
-                    return null; //no islamophobic channels found
-                }*/
+
                 getIslamophobicVideosQuery.close();
             } catch (Exception e) {
                 e.printStackTrace();

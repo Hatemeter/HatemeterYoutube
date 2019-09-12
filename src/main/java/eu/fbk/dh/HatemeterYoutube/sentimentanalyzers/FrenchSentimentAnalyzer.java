@@ -6,6 +6,8 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import com.google.gson.JsonSyntaxException;
 import com.meaningcloud.*;
 
 public class FrenchSentimentAnalyzer extends SentimentAnalyzer {
@@ -55,7 +57,7 @@ public class FrenchSentimentAnalyzer extends SentimentAnalyzer {
                             .build(frenchLemmasApikey, language)
                             .withText(comment.trim())
                             .send();
-                } catch (NumberFormatException e) {
+                } catch (JsonSyntaxException | NumberFormatException e) {
                     //don't want the "expected an int error to print"
                 }
 
